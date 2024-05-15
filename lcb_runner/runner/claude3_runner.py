@@ -22,7 +22,6 @@ class Claude3Runner(BaseRunner):
         }
 
     def _run_single(self, prompt: tuple[str, str]) -> list[str]:
-
         def __run_single(counter):
             try:
                 response = self.client.messages.create(

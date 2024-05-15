@@ -1,13 +1,13 @@
 import json
 
 try:
-    from anthropic import HUMAN_PROMPT, AI_PROMPT
+    from anthropic import AI_PROMPT, HUMAN_PROMPT
 except ImportError:
     HUMAN_PROMPT = None
     AI_PROMPT = None
 
-from lcb_runner.lm_styles import LMStyle
 from lcb_runner.benchmarks.code_generation import CodeGenerationProblem
+from lcb_runner.lm_styles import LMStyle
 
 
 class PromptConstants:
@@ -32,12 +32,12 @@ class PromptConstants:
 def get_generic_question_template_answer(question: CodeGenerationProblem):
     prompt = f"### Question:\n{question.question_content}\n\n"
     if question.starter_code:
-        prompt += (
-            f"### Format: {PromptConstants.FORMATTING_MESSAGE_WITH_STARTER_CODE}\n"
-        )
+        prompt += f"### Format: {PromptConstants.FORMATTING_MESSAGE_WITH_STARTER_CODE}\n"
         prompt += f"```python\n{question.starter_code}\n```\n\n"
     else:
-        prompt += f"### Format: {PromptConstants.FORMATTING_WITHOUT_STARTER_CODE}\n"
+        prompt += (
+            f"### Format: {PromptConstants.FORMATTING_WITHOUT_STARTER_CODE}\n"
+        )
         prompt += "```python\n# YOUR CODE HERE\n```\n\n"
     prompt += f"### Answer: (use the provided format with backticks)\n\n"
     return prompt
@@ -59,14 +59,10 @@ def get_deepseekcode_question_template_answer(question: CodeGenerationProblem):
     prompt = f"### Instruction: You will be given a question (problem specification) and will generate a correct Python program that matches the specification and passes all tests. You will NOT return anything except for the program.\n\n"
     prompt += f"Question:\n{question.question_content}\n\n"
     if question.starter_code:
-        prompt += (
-            f"### Instruction: {PromptConstants.FORMATTING_MESSAGE_WITH_STARTER_CODE}\n"
-        )
+        prompt += f"### Instruction: {PromptConstants.FORMATTING_MESSAGE_WITH_STARTER_CODE}\n"
         prompt += f"```python\n{question.starter_code}\n```\n\n"
     else:
-        prompt += (
-            f"### Instruction: {PromptConstants.FORMATTING_WITHOUT_STARTER_CODE}\n"
-        )
+        prompt += f"### Instruction: {PromptConstants.FORMATTING_WITHOUT_STARTER_CODE}\n"
         prompt += f"```python\n# YOUR CODE HERE\n```\n\n"
     prompt += f"### Response:\n\n"
     return prompt
@@ -106,7 +102,9 @@ def get_magicoder_question_template_answer(question: CodeGenerationProblem):
     prompt = f"You will be given a question (problem specification) and will generate a correct Python program that matches the specification and passes all tests. You will NOT return anything except for the program.\n\n"
     prompt += f"Question:\n{question.question_content}\n\n"
     if question.starter_code:
-        prompt += f"Format: {PromptConstants.FORMATTING_MESSAGE_WITH_STARTER_CODE}\n"
+        prompt += (
+            f"Format: {PromptConstants.FORMATTING_MESSAGE_WITH_STARTER_CODE}\n"
+        )
         prompt += f"```python\n{question.starter_code}\n```\n\n"
     else:
         prompt += f"Format: {PromptConstants.FORMATTING_WITHOUT_STARTER_CODE}\n"
@@ -218,7 +216,9 @@ def format_prompt_generation(
         from transformers import AutoTokenizer
 
         tokenizer = AutoTokenizer.from_pretrained(
-            "meta-llama/Meta-Llama-3-8B-Instruct", padding_side="left", use_fast=False
+            "meta-llama/Meta-Llama-3-8B-Instruct",
+            padding_side="left",
+            use_fast=False,
         )
         return tokenizer.apply_chat_template(
             chat_messages,
@@ -240,7 +240,9 @@ def format_prompt_generation(
         prompt = [
             {
                 "role": "user",
-                "content": get_generic_question_template_answer(question).rstrip(),
+                "content": get_generic_question_template_answer(
+                    question
+                ).rstrip(),
             }
         ]
         return system, prompt

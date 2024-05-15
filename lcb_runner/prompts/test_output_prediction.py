@@ -1,9 +1,9 @@
 import json
 
-from anthropic import HUMAN_PROMPT, AI_PROMPT
+from anthropic import AI_PROMPT, HUMAN_PROMPT
 
-from lcb_runner.lm_styles import LMStyle
 from lcb_runner.benchmarks import TestOutputPredictionProblem
+from lcb_runner.lm_styles import LMStyle
 
 
 class PromptConstants:
@@ -74,9 +74,7 @@ def get_generic_question_template_test_completion(
     # parse function name from starter_code
     func_name = parse_function_name_from_starter_code(question.starter_code)
     prompt += "Please complete the following test case:\n\n"
-    prompt += (
-        f"```\n{format_testcase_func_name_input(func_name, testcase_input)}\n```\n"
-    )
+    prompt += f"```\n{format_testcase_func_name_input(func_name, testcase_input)}\n```\n"
 
     return prompt
 
@@ -85,7 +83,9 @@ def get_cllama_question_template_answer(
     question: TestOutputPredictionProblem, testcase_input: str
 ):
     prompt = f"### Question\n"
-    prompt += get_generic_question_template_test_completion(question, testcase_input)
+    prompt += get_generic_question_template_test_completion(
+        question, testcase_input
+    )
     prompt += f"### Answer\n"
     return prompt
 
@@ -93,8 +93,12 @@ def get_cllama_question_template_answer(
 def get_deepseekcode_question_template_answer(
     question: TestOutputPredictionProblem, testcase_input: str
 ):
-    prompt = f"### Instruction: {PromptConstants.SYSTEM_MESSAGE_CHAT_GENERIC}\n\n"
-    prompt += get_generic_question_template_test_completion(question, testcase_input)
+    prompt = (
+        f"### Instruction: {PromptConstants.SYSTEM_MESSAGE_CHAT_GENERIC}\n\n"
+    )
+    prompt += get_generic_question_template_test_completion(
+        question, testcase_input
+    )
     prompt += f"### Response:\n\n"
     return prompt
 
@@ -104,7 +108,9 @@ def get_magicoder_question_template_answer(
 ):
     # prompt = f"You will be given a question (problem specification) and will generate a correct Python program that matches the specification and passes all tests. You will NOT return anything except for the program.\n\n"
     prompt = f"Question:\n"
-    prompt += get_generic_question_template_test_completion(question, testcase_input)
+    prompt += get_generic_question_template_test_completion(
+        question, testcase_input
+    )
     prompt += f"@@ Response \n"
     return prompt
 
@@ -112,15 +118,21 @@ def get_magicoder_question_template_answer(
 def get_mixtral_question_template_answer(
     question: TestOutputPredictionProblem, testcase_input: str
 ):
-    prompt = get_generic_question_template_test_completion(question, testcase_input)
+    prompt = get_generic_question_template_test_completion(
+        question, testcase_input
+    )
     return prompt
 
 
 def get_wizard_question_template_answer(
     question: TestOutputPredictionProblem, testcase_input: str
 ):
-    prompt = f"""### Instruction: {PromptConstants.SYSTEM_MESSAGE_CHAT_GENERIC}\n"""
-    prompt += get_generic_question_template_test_completion(question, testcase_input)
+    prompt = (
+        f"""### Instruction: {PromptConstants.SYSTEM_MESSAGE_CHAT_GENERIC}\n"""
+    )
+    prompt += get_generic_question_template_test_completion(
+        question, testcase_input
+    )
     prompt += f"### Response:\n"
     return prompt
 
@@ -128,7 +140,9 @@ def get_wizard_question_template_answer(
 def get_phind_question_template_answer(
     question: TestOutputPredictionProblem, testcase_input: str
 ):
-    prompt = get_generic_question_template_test_completion(question, testcase_input)
+    prompt = get_generic_question_template_test_completion(
+        question, testcase_input
+    )
     prompt += f"\n\n### Assistant"
     return prompt
 
@@ -171,7 +185,9 @@ def format_prompt_test_output(
         from transformers import AutoTokenizer
 
         tokenizer = AutoTokenizer.from_pretrained(
-            "meta-llama/Meta-Llama-3-8B-Instruct", padding_side="left", use_fast=False
+            "meta-llama/Meta-Llama-3-8B-Instruct",
+            padding_side="left",
+            use_fast=False,
         )
         return tokenizer.apply_chat_template(
             chat_messages,
@@ -181,7 +197,9 @@ def format_prompt_test_output(
             padding=False,
         )
     elif LanguageModelStyle == LMStyle.Claude:
-        prompt = f"{HUMAN_PROMPT}\n{PromptConstants.SYSTEM_MESSAGE_CHAT_GENERIC}\n\n"
+        prompt = (
+            f"{HUMAN_PROMPT}\n{PromptConstants.SYSTEM_MESSAGE_CHAT_GENERIC}\n\n"
+        )
         prompt += f"{get_generic_question_template_test_completion(question, testcase_input).rstrip()}\n{AI_PROMPT}"
         return prompt
     elif LanguageModelStyle == LMStyle.Claude3:
@@ -197,28 +215,20 @@ def format_prompt_test_output(
         return system, prompt
     elif LanguageModelStyle == LMStyle.Gemini:
         prompt = f"{PromptConstants.SYSTEM_MESSAGE_CHAT_GENERIC}\n"
-        prompt += (
-            f"{get_generic_question_template_test_completion(question, testcase_input)}"
-        )
+        prompt += f"{get_generic_question_template_test_completion(question, testcase_input)}"
         return prompt
 
     elif LanguageModelStyle == LMStyle.StarCoderInstruct:
         prompt = f"{PromptConstants.SYSTEM_MESSAGE_CHAT_GENERIC}\n"
-        prompt += (
-            f"{get_generic_question_template_test_completion(question, testcase_input)}"
-        )
+        prompt += f"{get_generic_question_template_test_completion(question, testcase_input)}"
         return prompt
 
     elif LanguageModelStyle == LMStyle.DeepSeekCodeInstruct:
-        prompt = (
-            f"{get_deepseekcode_question_template_answer(question, testcase_input)}"
-        )
+        prompt = f"{get_deepseekcode_question_template_answer(question, testcase_input)}"
         return prompt
     elif LanguageModelStyle == LMStyle.CodeLLaMaInstruct:
         prompt = f"[INST] <<SYS>>\n{PromptConstants.SYSTEM_MESSAGE_INST_CLLAMA}\n<</SYS>>\n\n"
-        prompt += (
-            f"{get_cllama_question_template_answer(question, testcase_input)}\n[/INST]"
-        )
+        prompt += f"{get_cllama_question_template_answer(question, testcase_input)}\n[/INST]"
         return prompt
     elif LanguageModelStyle == LMStyle.MagiCoder:
         prompt = f"{PromptConstants.SYSTEM_MESSAGE_CHAT_GENERIC}\n"
@@ -232,9 +242,7 @@ def format_prompt_test_output(
         return prompt
     elif LanguageModelStyle == LMStyle.OC:
         prompt = f"{PromptConstants.SYSTEM_MESSAGE_CHAT_GENERIC}\n"
-        prompt += (
-            f"{get_generic_question_template_test_completion(question, testcase_input)}"
-        )
+        prompt += f"{get_generic_question_template_test_completion(question, testcase_input)}"
         return prompt
     elif LanguageModelStyle == LMStyle.MistralWeb:
         chat_messages = [

@@ -1,18 +1,15 @@
-import os
 import json
+import os
 
-from lcb_runner.runner.parser import get_args
-from lcb_runner.utils.scenarios import Scenario
-from lcb_runner.lm_styles import LanguageModelStore
-from lcb_runner.runner.runner_utils import build_runner
-from lcb_runner.utils.path_utils import get_output_path
 from lcb_runner.evaluation import extract_instance_results
-from lcb_runner.runner.scenario_router import (
-    build_prompt_benchmark,
-    combine_results,
-    sort_and_extract_save_results,
-    get_metrics,
-)
+from lcb_runner.lm_styles import LanguageModelStore
+from lcb_runner.runner.parser import get_args
+from lcb_runner.runner.runner_utils import build_runner
+from lcb_runner.runner.scenario_router import (build_prompt_benchmark,
+                                               combine_results, get_metrics,
+                                               sort_and_extract_save_results)
+from lcb_runner.utils.path_utils import get_output_path
+from lcb_runner.utils.scenarios import Scenario
 
 
 def main():
@@ -63,7 +60,9 @@ def main():
 
     save_results = [
         instance.insert_output(outputs_list, extracted_list)
-        for instance, (outputs_list, extracted_list) in zip(benchmark, combined_results)
+        for instance, (outputs_list, extracted_list) in zip(
+            benchmark, combined_results
+        )
     ]
 
     if args.continue_existing:
@@ -87,7 +86,10 @@ def main():
                 instance.insert_output_evaluation(
                     outputs_list, extracted_list, graded_list, metadata=meta
                 )
-                for instance, (outputs_list, extracted_list), graded_list, meta in zip(
+                for instance, (
+                    outputs_list,
+                    extracted_list,
+                ), graded_list, meta in zip(
                     benchmark, combined_results, graded, metadatas
                 )
             ]
@@ -113,7 +115,11 @@ def main():
                     outputs_list,
                     extracted_list,
                 ), graded_list, meta, original_code_list in zip(
-                    benchmark, combined_results, graded, metadatas, original_code_lists
+                    benchmark,
+                    combined_results,
+                    graded,
+                    metadatas,
+                    original_code_lists,
                 )
             ]
 
@@ -122,9 +128,10 @@ def main():
                 instance.insert_output_evaluation(
                     outputs_list, extracted_list, graded_list
                 )
-                for instance, (outputs_list, extracted_list), graded_list in zip(
-                    benchmark, combined_results, graded
-                )
+                for instance, (
+                    outputs_list,
+                    extracted_list,
+                ), graded_list in zip(benchmark, combined_results, graded)
             ]
 
         with open(output_path.replace(".json", "_eval.json"), "w") as f:

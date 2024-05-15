@@ -1,16 +1,16 @@
 """ Utilities for running functions in parallel processes. """
-import sys
-import resource
 import multiprocessing as mp
 import queue
+import resource
+import sys
 import traceback
-from enum import Enum
-from typing import Callable, Optional, Dict, Any, List, Iterator
 from concurrent.futures import TimeoutError
+from enum import Enum
+from typing import Any, Callable, Dict, Iterator, List, Optional
 
 import attrs
 import tqdm
-from pebble import concurrent, ProcessPool, ProcessExpired
+from pebble import ProcessExpired, ProcessPool, concurrent
 
 
 class FuncTimeoutError(TimeoutError):
@@ -51,7 +51,9 @@ def run_func_in_process(
         The result of executing the function.
     """
     mode = "spawn" if _use_spawn else "fork"
-    c_func = concurrent.process(timeout=_timeout, context=mp.get_context(mode))(func)
+    c_func = concurrent.process(timeout=_timeout, context=mp.get_context(mode))(
+        func
+    )
     future = c_func(*args, **kwargs)
 
     try:
@@ -184,7 +186,10 @@ def run_tasks_in_parallel_iter(
             if pbar is not None:
                 pbar.update(1)
                 pbar.set_postfix(
-                    succ=succ, timeouts=timeouts, exc=exceptions, p_exp=expirations
+                    succ=succ,
+                    timeouts=timeouts,
+                    exc=exceptions,
+                    p_exp=expirations,
                 )
                 sys.stdout.flush()
                 sys.stderr.flush()

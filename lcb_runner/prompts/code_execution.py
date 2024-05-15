@@ -1,7 +1,7 @@
 import json
 
-from lcb_runner.lm_styles import LMStyle
 from lcb_runner.benchmarks import CodeExecutionProblem
+from lcb_runner.lm_styles import LMStyle
 
 
 def make_cot_output_prompt(s):
@@ -108,7 +108,9 @@ def format_prompt_execution_base(
         from transformers import AutoTokenizer
 
         tokenizer = AutoTokenizer.from_pretrained(
-            "meta-llama/Meta-Llama-3-8B-Instruct", padding_side="left", use_fast=False
+            "meta-llama/Meta-Llama-3-8B-Instruct",
+            padding_side="left",
+            use_fast=False,
         )
         return tokenizer.apply_chat_template(
             chat_messages,

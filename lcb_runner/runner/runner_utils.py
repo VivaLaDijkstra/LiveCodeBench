@@ -1,4 +1,4 @@
-from lcb_runner.lm_styles import LMStyle, LanguageModel
+from lcb_runner.lm_styles import LanguageModel, LMStyle
 
 
 def build_runner(args, model: LanguageModel):

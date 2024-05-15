@@ -1,12 +1,10 @@
 import json
 
-from lcb_runner.runner.parser import get_args
 from lcb_runner.evaluation import extract_instance_results
-from lcb_runner.runner.scenario_router import (
-    build_prompt_benchmark,
-    sort_and_extract_save_results,
-    get_metrics,
-)
+from lcb_runner.runner.parser import get_args
+from lcb_runner.runner.scenario_router import (build_prompt_benchmark,
+                                               get_metrics,
+                                               sort_and_extract_save_results)
 
 
 def main():
@@ -24,7 +22,8 @@ def main():
             ## sorted by the benchmark question_id
 
             assert all(
-                isinstance(custom_output, list) for custom_output in custom_outputs
+                isinstance(custom_output, list)
+                for custom_output in custom_outputs
             )
         elif isinstance(custom_outputs[0], dict):
             ## custom outputs must list[dict[str, Any]]
@@ -32,7 +31,8 @@ def main():
             ## sorted by the benchmark question_id
 
             assert all(
-                isinstance(custom_output, dict) for custom_output in custom_outputs
+                isinstance(custom_output, dict)
+                for custom_output in custom_outputs
             )
             custom_outputs = [
                 custom_output["code_list"]
@@ -50,7 +50,9 @@ def main():
         args.scenario, save_results
     )
 
-    output_path = args.custom_output_file[:-5] + f"_{args.scenario.value}_output.json"
+    output_path = (
+        args.custom_output_file[:-5] + f"_{args.scenario.value}_output.json"
+    )
 
     with open(output_path, "w") as f:
         json.dump(save_results, f, indent=4)
@@ -59,7 +61,9 @@ def main():
     graded = extract_instance_results(metrics[1])
 
     save_eval_results = [
-        instance.insert_output_evaluation(outputs_list, extracted_list, graded_list)
+        instance.insert_output_evaluation(
+            outputs_list, extracted_list, graded_list
+        )
         for instance, (outputs_list, extracted_list), graded_list in zip(
             benchmark, combined_results, graded
         )

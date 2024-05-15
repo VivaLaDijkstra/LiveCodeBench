@@ -42,7 +42,6 @@ class GeminiRunner(BaseRunner):
         )
 
     def _run_single(self, prompt: str) -> list[str]:
-
         def __run_single(counter):
             try:
                 return self.client.generate_content(

@@ -1,6 +1,7 @@
-import os
-import torch
 import argparse
+import os
+
+import torch
 
 from lcb_runner.utils.scenarios import Scenario
 
@@ -45,9 +46,14 @@ def get_args():
         help="Number of samples for which code generation was run (used to map the code generation file during self-repair)",
     )
     parser.add_argument(
-        "--temperature", type=float, default=0.2, help="Temperature for sampling"
+        "--temperature",
+        type=float,
+        default=0.2,
+        help="Temperature for sampling",
     )
-    parser.add_argument("--top_p", type=float, default=0.95, help="Top p for sampling")
+    parser.add_argument(
+        "--top_p", type=float, default=0.95, help="Top p for sampling"
+    )
     parser.add_argument(
         "--max_tokens", type=int, default=1200, help="Max tokens for sampling"
     )
@@ -68,19 +74,29 @@ def get_args():
         "--use_cache", action="store_true", help="Use cache for generation"
     )
     parser.add_argument(
-        "--cache_batch_size", type=int, default=100, help="Batch size for caching"
+        "--cache_batch_size",
+        type=int,
+        default=100,
+        help="Batch size for caching",
     )
     parser.add_argument("--debug", action="store_true", help="Debug mode")
-    parser.add_argument("--evaluate", action="store_true", help="Evaluate the results")
+    parser.add_argument(
+        "--evaluate", action="store_true", help="Evaluate the results"
+    )
     parser.add_argument(
         "--num_process_evaluate",
         type=int,
         default=12,
         help="Number of processes to use for evaluation",
     )
-    parser.add_argument("--timeout", type=int, default=6, help="Timeout for evaluation")
     parser.add_argument(
-        "--openai_timeout", type=int, default=45, help="Timeout for requests to OpenAI"
+        "--timeout", type=int, default=6, help="Timeout for evaluation"
+    )
+    parser.add_argument(
+        "--openai_timeout",
+        type=int,
+        default=45,
+        help="Timeout for requests to OpenAI",
     )
     parser.add_argument(
         "--tensor_parallel_size",
@@ -99,7 +115,9 @@ def get_args():
         default=None,
         help="Path to the custom output file used in `custom_evaluator.py`",
     )
-    parser.add_argument("--dtype", type=str, default="bfloat16", help="Dtype for vllm")
+    parser.add_argument(
+        "--dtype", type=str, default="bfloat16", help="Dtype for vllm"
+    )
 
     args = parser.parse_args()
 

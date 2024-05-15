@@ -1,7 +1,7 @@
 import json
-from enum import Enum
-from datetime import datetime
 from dataclasses import dataclass
+from datetime import datetime
+from enum import Enum
 
 from datasets import load_dataset
 
@@ -23,7 +23,9 @@ class CodeExecutionProblem:
     def __post_init__(self):
         pass
 
-    def insert_output(self, output_list: list[str], pred_list: list[str]) -> dict:
+    def insert_output(
+        self, output_list: list[str], pred_list: list[str]
+    ) -> dict:
         return {
             "question_id": self.question_id,
             "contest_id": self.contest_id,
@@ -41,7 +43,10 @@ class CodeExecutionProblem:
         }
 
     def insert_output_evaluation(
-        self, output_list: list[str], code_list: list[str], graded_list: list[bool]
+        self,
+        output_list: list[str],
+        code_list: list[str],
+        graded_list: list[bool],
     ) -> dict:
         output = self.insert_output(output_list, code_list)
         output["graded_list"] = graded_list

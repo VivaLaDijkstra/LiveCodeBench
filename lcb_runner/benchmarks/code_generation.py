@@ -1,10 +1,10 @@
-import json
-import zlib
-import pickle
 import base64
-from enum import Enum
-from datetime import datetime
+import json
+import pickle
+import zlib
 from dataclasses import dataclass
+from datetime import datetime
+from enum import Enum
 
 from datasets import load_dataset
 
@@ -74,7 +74,9 @@ class CodeGenerationProblem:
 
         self.metadata = json.loads(self.metadata)  # type: ignore
 
-    def insert_output(self, output_list: list[str], code_list: list[str]) -> dict:
+    def insert_output(
+        self, output_list: list[str], code_list: list[str]
+    ) -> dict:
         return {
             "question_title": self.question_title,
             "question_content": self.question_content,
@@ -108,11 +110,13 @@ class CodeGenerationProblem:
                 {
                     "inputs": [
                         t.input
-                        for t in self.public_test_cases + self.private_test_cases
+                        for t in self.public_test_cases
+                        + self.private_test_cases
                     ],
                     "outputs": [
                         t.output
-                        for t in self.public_test_cases + self.private_test_cases
+                        for t in self.public_test_cases
+                        + self.private_test_cases
                     ],
                     "fn_name": self.metadata.get("func_name", None),
                 }

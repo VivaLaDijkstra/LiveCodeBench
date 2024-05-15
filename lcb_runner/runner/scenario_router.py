@@ -1,39 +1,29 @@
 from typing import Union
 
-from lcb_runner.utils.scenarios import Scenario
+from lcb_runner.benchmarks import (CodeExecutionProblem, CodeGenerationProblem,
+                                   TestOutputPredictionProblem,
+                                   load_code_execution_dataset,
+                                   load_code_generation_dataset,
+                                   load_code_generation_dataset_not_fast,
+                                   load_test_prediction_dataset)
+from lcb_runner.evaluation import (code_execution_metrics, codegen_metrics,
+                                   test_output_metrics)
 from lcb_runner.lm_styles import LanguageModel
-from lcb_runner.evaluation import (
-    codegen_metrics,
-    test_output_metrics,
-    code_execution_metrics,
-)
-
-from lcb_runner.prompts import (
-    format_prompt_generation,
-    format_prompt_test_output,
-    format_prompt_execution,
-    format_prompt_execution_cot,
-    format_prompt_self_repair,
-)
-from lcb_runner.utils.extraction_utils import (
-    extract_code,
-    extract_test_output_code,
-    extract_execution_code,
-)
-
-from lcb_runner.benchmarks import (
-    CodeGenerationProblem,
-    TestOutputPredictionProblem,
-    CodeExecutionProblem,
-    load_code_generation_dataset,
-    load_code_generation_dataset_not_fast,
-    load_test_prediction_dataset,
-    load_code_execution_dataset,
-)
+from lcb_runner.prompts import (format_prompt_execution,
+                                format_prompt_execution_cot,
+                                format_prompt_generation,
+                                format_prompt_self_repair,
+                                format_prompt_test_output)
+from lcb_runner.utils.extraction_utils import (extract_code,
+                                               extract_execution_code,
+                                               extract_test_output_code)
+from lcb_runner.utils.scenarios import Scenario
 
 # BenchMarkType = list[CodeGenerationProblem | TestOutputPredictionProblem]
 BenchMarkType = list[
-    Union[CodeGenerationProblem, CodeExecutionProblem, TestOutputPredictionProblem]
+    Union[
+        CodeGenerationProblem, CodeExecutionProblem, TestOutputPredictionProblem
+    ]
 ]
 
 
@@ -86,7 +76,10 @@ def combine_results(
         combined_results = [
             (
                 outputs_list,
-                [extract_code(output, model.model_style) for output in outputs_list],
+                [
+                    extract_code(output, model.model_style)
+                    for output in outputs_list
+                ],
             )
             for outputs_list in results
         ]
@@ -142,7 +135,10 @@ def sort_and_extract_save_results(scenario: Scenario, save_results: list[dict]):
     if scenario == Scenario.codegeneration:
         save_results = sorted(save_results, key=lambda x: x["question_id"])
         combined_results = [
-            (save_result_instance["output_list"], save_result_instance["code_list"])
+            (
+                save_result_instance["output_list"],
+                save_result_instance["code_list"],
+            )
             for save_result_instance in save_results
         ]
 
@@ -151,19 +147,30 @@ def sort_and_extract_save_results(scenario: Scenario, save_results: list[dict]):
             save_results, key=lambda x: (x["question_id"], x["test_id"])
         )
         combined_results = [
-            (save_result_instance["output_list"], save_result_instance["pred_list"])
+            (
+                save_result_instance["output_list"],
+                save_result_instance["pred_list"],
+            )
             for save_result_instance in save_results
         ]
     elif scenario == Scenario.selfrepair:
         save_results = sorted(save_results, key=lambda x: x["question_id"])
         combined_results = [
-            (save_result_instance["output_list"], save_result_instance["code_list"])
+            (
+                save_result_instance["output_list"],
+                save_result_instance["code_list"],
+            )
             for save_result_instance in save_results
         ]
     elif scenario == Scenario.codeexecution:
-        save_results = sorted(save_results, key=lambda x: int(x["id"].split("_")[1]))
+        save_results = sorted(
+            save_results, key=lambda x: int(x["id"].split("_")[1])
+        )
         combined_results = [
-            (save_result_instance["output_list"], save_result_instance["pred_list"])
+            (
+                save_result_instance["output_list"],
+                save_result_instance["pred_list"],
+            )
             for save_result_instance in save_results
         ]
 
@@ -177,12 +184,16 @@ def get_metrics(
     scenario: Scenario,
     args,
     benchmark: list[
-        CodeGenerationProblem | CodeExecutionProblem | TestOutputPredictionProblem
+        CodeGenerationProblem
+        | CodeExecutionProblem
+        | TestOutputPredictionProblem
     ],
     combined_results,
 ):
     if scenario == Scenario.codegeneration or scenario == Scenario.selfrepair:
-        eval_samples = [instance.get_evaluation_sample() for instance in benchmark]
+        eval_samples = [
+            instance.get_evaluation_sample() for instance in benchmark
+        ]
         generations = [extracted for _, extracted in combined_results]
         metrics = codegen_metrics(
             eval_samples,
@@ -192,7 +203,9 @@ def get_metrics(
         )
 
     elif args.scenario == Scenario.testoutputprediction:
-        eval_samples = [instance.get_evaluation_sample() for instance in benchmark]
+        eval_samples = [
+            instance.get_evaluation_sample() for instance in benchmark
+        ]
         generations = [extracted for _, extracted in combined_results]
         metrics = test_output_metrics(
             eval_samples,
@@ -201,7 +214,9 @@ def get_metrics(
         )
 
     elif args.scenario == Scenario.codeexecution:
-        eval_samples = [instance.get_evaluation_sample() for instance in benchmark]
+        eval_samples = [
+            instance.get_evaluation_sample() for instance in benchmark
+        ]
         generations = [extracted for _, extracted in combined_results]
         for g in generations:
             print(g)

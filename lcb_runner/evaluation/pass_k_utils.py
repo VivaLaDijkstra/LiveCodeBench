@@ -19,7 +19,10 @@ def estimate_pass_at_k(num_samples, num_correct, k):
         num_samples_it = iter(num_samples)
 
     return np.array(
-        [estimator(int(n), int(c), k) for n, c in zip(num_samples_it, num_correct)]
+        [
+            estimator(int(n), int(c), k)
+            for n, c in zip(num_samples_it, num_correct)
+        ]
     )
 
 
@@ -48,7 +51,9 @@ def compute_metrics_from_results(results, k_list=[1, 5]):
         for k in ks
         if (total >= k).all()
     }
-    detail_metrics = {k: dict(zip(task_ids, v)) for k, v in detail_pass_at_k.items()}
+    detail_metrics = {
+        k: dict(zip(task_ids, v)) for k, v in detail_pass_at_k.items()
+    }
     pass_at_k["detail"] = detail_metrics
     return pass_at_k
 
@@ -58,9 +63,14 @@ def extract_instance_results(results):
     for task_id, res in results.items():
         instance_wise_grades[task_id] = []
         for generation in res:
-            instance_wise_grades[task_id].append(all([g > 0 for g in generation]))
+            instance_wise_grades[task_id].append(
+                all([g > 0 for g in generation])
+            )
 
     instance_wise_grades = [
-        v for _, v in sorted(instance_wise_grades.items(), key=lambda item: item[0])
+        v
+        for _, v in sorted(
+            instance_wise_grades.items(), key=lambda item: item[0]
+        )
     ]
     return instance_wise_grades

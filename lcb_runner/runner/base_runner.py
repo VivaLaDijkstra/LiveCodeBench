@@ -1,13 +1,13 @@
-import os
 import json
+import os
 from abc import ABC, abstractmethod
 
 from tqdm import tqdm
 
 from lcb_runner.lm_styles import LanguageModel
-from lcb_runner.utils.path_utils import get_cache_path
-from lcb_runner.utils.multiprocess import run_tasks_in_parallel
 from lcb_runner.runner.scenario_router import Scenario
+from lcb_runner.utils.multiprocess import run_tasks_in_parallel
+from lcb_runner.utils.path_utils import get_cache_path
 
 
 class BaseRunner(ABC):
@@ -59,7 +59,9 @@ class BaseRunner(ABC):
 
         return result
 
-    def run_batch(self, prompts: list[str | list[dict[str, str]]]) -> list[list[str]]:
+    def run_batch(
+        self, prompts: list[str | list[dict[str, str]]]
+    ) -> list[list[str]]:
         outputs = []
         arguments = [
             (
@@ -86,7 +88,9 @@ class BaseRunner(ABC):
                     print(output.exception_tb)
                     outputs.extend([""] * self.args.n)
         else:
-            outputs = [self.run_single(argument) for argument in tqdm(arguments)]
+            outputs = [
+                self.run_single(argument) for argument in tqdm(arguments)
+            ]
 
         if self.args.use_cache:
             for prompt, output in zip(prompts, outputs):
@@ -126,7 +130,9 @@ class BaseRunner(ABC):
         prompt_index_to_question_idx = {}
         prompt_index_to_code_idx = {}
 
-        for check_metadata_idx, check_metadata in enumerate(check_metadata_list):
+        for check_metadata_idx, check_metadata in enumerate(
+            check_metadata_list
+        ):
             question_content = check_metadata["question_content"]
             code_list = check_metadata["code_list"]
             output_list = check_metadata["output_list"]
@@ -141,10 +147,14 @@ class BaseRunner(ABC):
                     metadata[code_idx],
                 )
                 if prompt == "":
-                    outputs[check_metadata_idx][code_idx] = output_list[code_idx]
+                    outputs[check_metadata_idx][code_idx] = output_list[
+                        code_idx
+                    ]
                     continue
                 prompts.append(prompt)
-                prompt_index_to_question_idx[len(prompts) - 1] = check_metadata_idx
+                prompt_index_to_question_idx[
+                    len(prompts) - 1
+                ] = check_metadata_idx
                 prompt_index_to_code_idx[len(prompts) - 1] = code_idx
 
         prompt_outputs = self.prompts_to_outputs(prompts)
@@ -160,7 +170,8 @@ class BaseRunner(ABC):
             return self.run_main_repair(format_prompt)
 
         prompts = [
-            format_prompt(problem, self.model.model_style) for problem in benchmark
+            format_prompt(problem, self.model.model_style)
+            for problem in benchmark
         ]
         outputs = self.prompts_to_outputs(prompts)
         return outputs

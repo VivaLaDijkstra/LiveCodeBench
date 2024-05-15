@@ -37,7 +37,6 @@ def parse_assert_statement(statement):
 
 
 def check_testcase_output(testcase_str, expected_output):
-
     if len(testcase_str.splitlines()) > 1:
         for line in testcase_str.splitlines():
             if line.startswith("#"):
@@ -93,7 +92,9 @@ def test_output_metrics(
             idx_results.append([global_result])
         results.append(idx_results)
 
-    results = {result_idx: results[result_idx] for result_idx in range(len(results))}
+    results = {
+        result_idx: results[result_idx] for result_idx in range(len(results))
+    }
 
     metrics = compute_metrics_from_results(results, k_list=k_list)
 

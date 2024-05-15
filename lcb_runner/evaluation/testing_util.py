@@ -1,26 +1,20 @@
 import ast
-import json
-import sys
 import faulthandler
+import json
 import platform
-
-# used for debugging to time steps
-from datetime import datetime
-
 # to run the solution files we're using a timing based approach
 import signal
-
-import numpy as np
-
+import sys
+# used for debugging to time steps
+from datetime import datetime
+from enum import Enum
 # for capturing the stdout
 from io import StringIO
-
 # used for testing the code that reads from input
-from unittest.mock import patch, mock_open
+from unittest.mock import mock_open, patch
 
+import numpy as np
 from pyext import RuntimeModule
-
-from enum import Enum
 
 
 def truncatefn(s, length=300):
@@ -116,7 +110,6 @@ def run_test(sample, test=None, debug=False, timeout=6):
             print(f"loading test code = {datetime.now().time()}")
 
         if which_type == CODE_TYPE.call_based:
-
             sol += test
             if debug:
                 print(f"sol = {sol}")
@@ -148,7 +141,10 @@ def run_test(sample, test=None, debug=False, timeout=6):
                 last_block = astree.body[-1]
                 if isinstance(last_block, ast.If):
                     condition = last_block.test
-                    if ast.unparse(condition).strip() == "__name__ == '__main__'":
+                    if (
+                        ast.unparse(condition).strip()
+                        == "__name__ == '__main__'"
+                    ):
                         test = (
                             ast.unparse(astree.body[:-1])
                             + "\n"
@@ -161,7 +157,9 @@ def run_test(sample, test=None, debug=False, timeout=6):
 
             new_test = []
             for x in tmp_test:
-                if (not x.startswith("from ")) and (not x.startswith("import ")):
+                if (not x.startswith("from ")) and (
+                    not x.startswith("import ")
+                ):
                     new_test.append("\t" + x + "\n")
                 else:
                     new_test.append(x + "\n")
@@ -175,7 +173,9 @@ def run_test(sample, test=None, debug=False, timeout=6):
                     new_test += "def code():\n"
                     new_test += i
                     started = True
-                elif started and ((i.startswith("from ")) or (i.startswith("import "))):
+                elif started and (
+                    (i.startswith("from ")) or (i.startswith("import "))
+                ):
                     new_test += "\t" + i
                 else:
                     new_test += i
@@ -205,7 +205,9 @@ def run_test(sample, test=None, debug=False, timeout=6):
             print(f"get method = {datetime.now().time()}")
 
         try:
-            method = getattr(tmp, method_name)  # get_attr second arg must be str
+            method = getattr(
+                tmp, method_name
+            )  # get_attr second arg must be str
         except:
             signal.alarm(0)
             e = sys.exc_info()
@@ -222,7 +224,9 @@ def run_test(sample, test=None, debug=False, timeout=6):
             raw_outputs = in_outs["outputs"][index]
             if which_type == CODE_TYPE.call_based:
                 inputs = [json.loads(line) for line in inputs.split("\n")]
-                in_outs["outputs"][index] = json.loads(in_outs["outputs"][index])
+                in_outs["outputs"][index] = json.loads(
+                    in_outs["outputs"][index]
+                )
 
                 truncate_line_size = 300 // (raw_inputs.count("\n") + 1)
                 raw_inputs = "\n".join(
@@ -244,14 +248,20 @@ def run_test(sample, test=None, debug=False, timeout=6):
             try:
                 if isinstance(in_outs["outputs"][index], dict):
                     in_outs["outputs"][index] = [
-                        {int(k): v for k, v in in_outs["outputs"][index].items()}
+                        {
+                            int(k): v
+                            for k, v in in_outs["outputs"][index].items()
+                        }
                     ]
             except:
                 True
             try:
                 if isinstance(in_outs["outputs"][index][0], dict):
                     in_outs["outputs"][index] = [
-                        {int(k): v for k, v in in_outs["outputs"][index][0].items()}
+                        {
+                            int(k): v
+                            for k, v in in_outs["outputs"][index][0].items()
+                        }
                     ]
             except:
                 True
@@ -340,7 +350,9 @@ def run_test(sample, test=None, debug=False, timeout=6):
                 if isinstance(inputs, list):
                     inputs = "\n".join(inputs)
                 if isinstance(in_outs["outputs"][index], list):
-                    in_outs["outputs"][index] = "\n".join(in_outs["outputs"][index])
+                    in_outs["outputs"][index] = "\n".join(
+                        in_outs["outputs"][index]
+                    )
 
                 signal.alarm(timeout)
                 with Capturing() as output:
@@ -407,10 +419,13 @@ def run_test(sample, test=None, debug=False, timeout=6):
                 try:
                     tmp_result = output == [in_outs["outputs"][index]]
                     if isinstance(in_outs["outputs"][index], list):
-                        tmp_result = tmp_result or (output == in_outs["outputs"][index])
+                        tmp_result = tmp_result or (
+                            output == in_outs["outputs"][index]
+                        )
                         if isinstance(output[0], str):
                             tmp_result = tmp_result or (
-                                [e.strip() for e in output] == in_outs["outputs"][index]
+                                [e.strip() for e in output]
+                                == in_outs["outputs"][index]
                             )
                 except Exception as e:
                     if debug:
@@ -426,10 +441,14 @@ def run_test(sample, test=None, debug=False, timeout=6):
                     for tmp_index, i in enumerate(in_outs["outputs"][index]):
                         in_outs["outputs"][index][tmp_index] = i.split("\n")
                         in_outs["outputs"][index][tmp_index] = [
-                            x.strip() for x in in_outs["outputs"][index][tmp_index] if x
+                            x.strip()
+                            for x in in_outs["outputs"][index][tmp_index]
+                            if x
                         ]
                 else:
-                    in_outs["outputs"][index] = in_outs["outputs"][index].split("\n")
+                    in_outs["outputs"][index] = in_outs["outputs"][index].split(
+                        "\n"
+                    )
                     in_outs["outputs"][index] = list(
                         filter(len, in_outs["outputs"][index])
                     )
@@ -440,7 +459,9 @@ def run_test(sample, test=None, debug=False, timeout=6):
                 try:
                     tmp_result = output == [in_outs["outputs"][index]]
                     if isinstance(in_outs["outputs"][index], list):
-                        tmp_result = tmp_result or (output == in_outs["outputs"][index])
+                        tmp_result = tmp_result or (
+                            output == in_outs["outputs"][index]
+                        )
                 except Exception as e:
                     if debug:
                         print(f"Failed check2 exception = {e}")
@@ -475,7 +496,9 @@ def run_test(sample, test=None, debug=False, timeout=6):
                 try:
                     tmp_result = output == [in_outs["outputs"][index]]
                     if isinstance(in_outs["outputs"][index], list):
-                        tmp_result = tmp_result or (output == in_outs["outputs"][index])
+                        tmp_result = tmp_result or (
+                            output == in_outs["outputs"][index]
+                        )
                 except Exception as e:
                     if debug:
                         print(f"Failed check3 exception = {e}")
@@ -493,8 +516,11 @@ def run_test(sample, test=None, debug=False, timeout=6):
                         if debug:
                             print(
                                 [
-                                    combined_int_check(e1) and combined_int_check(e2)
-                                    for e1, e2 in zip(output, in_outs["outputs"][index])
+                                    combined_int_check(e1)
+                                    and combined_int_check(e2)
+                                    for e1, e2 in zip(
+                                        output, in_outs["outputs"][index]
+                                    )
                                 ]
                             )
                         output_float = [float(e) for e in output]
@@ -513,11 +539,15 @@ def run_test(sample, test=None, debug=False, timeout=6):
                     if isinstance(output[0], list):
                         all_ints = all(
                             combined_int_check(e1) and combined_int_check(e2)
-                            for e1, e2 in zip(output[0], in_outs["outputs"][index])
+                            for e1, e2 in zip(
+                                output[0], in_outs["outputs"][index]
+                            )
                         )
                         if not all_ints:
                             output_float = [float(e) for e in output[0]]
-                            gt_float = [float(e) for e in in_outs["outputs"][index][0]]
+                            gt_float = [
+                                float(e) for e in in_outs["outputs"][index][0]
+                            ]
                             tmp_result = tmp_result or (
                                 (len(output_float) == len(gt_float))
                                 and np.allclose(output_float, gt_float)
@@ -536,7 +566,9 @@ def run_test(sample, test=None, debug=False, timeout=6):
                     for tmp_index, i in enumerate(in_outs["outputs"][index]):
                         in_outs["outputs"][index][tmp_index] = set(i.split())
                 else:
-                    in_outs["outputs"][index] = set(in_outs["outputs"][index].split())
+                    in_outs["outputs"][index] = set(
+                        in_outs["outputs"][index].split()
+                    )
 
                 if debug:
                     print(f"{tmp_result=} @e")
@@ -627,7 +659,6 @@ def run_test(sample, test=None, debug=False, timeout=6):
 
 
 def custom_compare_(output, ground_truth):
-
     if isinstance(output, list):
         output_1 = "\n".join(output)
         if stripped_string_compare(output_1, ground_truth):
@@ -649,7 +680,6 @@ def stripped_string_compare(s1, s2):
 
 
 def call_method(method, inputs):
-
     if isinstance(inputs, list):
         inputs = "\n".join(inputs)
 
@@ -698,7 +728,8 @@ def reliability_guard(maximum_memory_bytes=None):
         )
         if not platform.uname().system == "Darwin":
             resource.setrlimit(
-                resource.RLIMIT_STACK, (maximum_memory_bytes, maximum_memory_bytes)
+                resource.RLIMIT_STACK,
+                (maximum_memory_bytes, maximum_memory_bytes),
             )
 
     faulthandler.disable()

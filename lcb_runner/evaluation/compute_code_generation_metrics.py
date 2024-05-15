@@ -8,16 +8,17 @@ import json
 import multiprocessing
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
-
 import numpy as np
 from tqdm import tqdm
 
-from lcb_runner.evaluation.testing_util import run_test
 from lcb_runner.evaluation.pass_k_utils import compute_metrics_from_results
+from lcb_runner.evaluation.testing_util import run_test
 
 
 def _temp_run(sample, generation, debug, result, metadata_list, timeout):
-    res, metadata = run_test(sample, test=generation, debug=debug, timeout=timeout)
+    res, metadata = run_test(
+        sample, test=generation, debug=debug, timeout=timeout
+    )
     result.append(res)
     metadata_list.append(metadata)
 
@@ -36,7 +37,9 @@ def check_correctness(sample, generation, timeout, debug=True):
     )
     p.start()
     p.join(
-        timeout=(timeout + 1) * len(json.loads(sample["input_output"])["inputs"]) + 5
+        timeout=(timeout + 1)
+        * len(json.loads(sample["input_output"])["inputs"])
+        + 5
     )
     if p.is_alive():
         p.kill()
@@ -75,10 +78,14 @@ def evaluate_generations_by_problem(args):
             curr_res = fixed
             if not np.all(curr_res):
                 if debug:
-                    print(f"Results were not True for all test cases {curr_res=}\n")
+                    print(
+                        f"Results were not True for all test cases {curr_res=}\n"
+                    )
         except Exception as e:
             if debug:
-                print(f"Compilation failed, test framework exception = {repr(e)}{e}\n")
+                print(
+                    f"Compilation failed, test framework exception = {repr(e)}{e}\n"
+                )
             # break
             curr_metadata = {}
         finally:

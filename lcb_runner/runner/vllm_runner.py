@@ -12,7 +12,9 @@ class VLLMRunner(BaseRunner):
     def __init__(self, args, model):
         super().__init__(args, model)
         model_tokenizer_path = (
-            model.model_name if args.local_model_path is None else args.local_model_path
+            model.model_name
+            if args.local_model_path is None
+            else args.local_model_path
         )
         self.llm = LLM(
             model=model_tokenizer_path,
@@ -49,13 +51,17 @@ class VLLMRunner(BaseRunner):
             remaining_prompts.append(prompt)
             remaining_indices.append(prompt_index)
         if remaining_prompts:
-            vllm_outputs = self.llm.generate(remaining_prompts, self.sampling_params)
+            vllm_outputs = self.llm.generate(
+                remaining_prompts, self.sampling_params
+            )
             if self.args.use_cache:
                 assert len(remaining_prompts) == len(vllm_outputs)
                 for index, remaining_prompt, vllm_output in zip(
                     remaining_indices, remaining_prompts, vllm_outputs
                 ):
-                    self.cache[remaining_prompt] = [o.text for o in vllm_output.outputs]
+                    self.cache[remaining_prompt] = [
+                        o.text for o in vllm_output.outputs
+                    ]
                     outputs[index] = [o.text for o in vllm_output.outputs]
             else:
                 for index, vllm_output in zip(remaining_indices, vllm_outputs):

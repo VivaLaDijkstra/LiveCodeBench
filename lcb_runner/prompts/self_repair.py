@@ -1,6 +1,6 @@
 import json
 
-from anthropic import HUMAN_PROMPT, AI_PROMPT
+from anthropic import AI_PROMPT, HUMAN_PROMPT
 
 from lcb_runner.lm_styles import LMStyle
 
@@ -81,7 +81,9 @@ def get_cllama_question_template_answer(question: str, code, result, metadata):
     return prompt
 
 
-def get_deepseekcode_question_template_answer(question: str, code, result, metadata):
+def get_deepseekcode_question_template_answer(
+    question: str, code, result, metadata
+):
     prompt = f"### Instruction: You will be given a question (problem specification) and will generate a correct Python program that matches the specification and passes all tests. You will NOT return anything except for the program.\n\n"
     prompt += f"Question:\n{question}\n\n"
     prompt += f"### Response:\n```python\n{code}\n```\n\n"
@@ -92,7 +94,9 @@ def get_deepseekcode_question_template_answer(question: str, code, result, metad
     return prompt
 
 
-def get_magicoder_question_template_answer(question: str, code, result, metadata):
+def get_magicoder_question_template_answer(
+    question: str, code, result, metadata
+):
     prompt = f"You will be given a question (problem specification) and will generate a correct Python program that matches the specification and passes all tests. You will NOT return anything except for the program.\n\n"
     prompt += f"Question:\n{question}\n\n"
     prompt += f"@@ Response \n```python\n{code}\n```\n\n"
@@ -149,7 +153,10 @@ def format_prompt_self_repair(
         return ""
     if LanguageModelStyle == LMStyle.OpenAIChat:
         chat_messages = [
-            {"role": "system", "content": PromptConstants.SYSTEM_MESSAGE_GENERIC},
+            {
+                "role": "system",
+                "content": PromptConstants.SYSTEM_MESSAGE_GENERIC,
+            },
         ]
         chat_messages += [
             {
@@ -164,7 +171,10 @@ def format_prompt_self_repair(
         return chat_messages
     if LanguageModelStyle == LMStyle.LLaMa3:
         chat_messages = [
-            {"role": "system", "content": PromptConstants.SYSTEM_MESSAGE_GENERIC},
+            {
+                "role": "system",
+                "content": PromptConstants.SYSTEM_MESSAGE_GENERIC,
+            },
         ]
         chat_messages += [
             {
@@ -178,7 +188,9 @@ def format_prompt_self_repair(
         from transformers import AutoTokenizer
 
         tokenizer = AutoTokenizer.from_pretrained(
-            "meta-llama/Meta-Llama-3-8B-Instruct", padding_side="left", use_fast=False
+            "meta-llama/Meta-Llama-3-8B-Instruct",
+            padding_side="left",
+            use_fast=False,
         )
         return tokenizer.apply_chat_template(
             chat_messages,
@@ -211,7 +223,9 @@ def format_prompt_self_repair(
         chat_messages += [
             {
                 "role": "user",
-                "content": get_generic_question_template_answer(question, code, result),
+                "content": get_generic_question_template_answer(
+                    question, code, result
+                ),
             },
         ]
         return chat_messages
@@ -246,7 +260,9 @@ def format_prompt_self_repair(
 def extract_code(model_output: str, lmstyle: LMStyle):
     outputlines = model_output.split("\n")
     if lmstyle == LMStyle.CodeLLaMa:
-        indexlines = [i for i, line in enumerate(outputlines) if "PYTHON]" in line]
+        indexlines = [
+            i for i, line in enumerate(outputlines) if "PYTHON]" in line
+        ]
     else:
         indexlines = [i for i, line in enumerate(outputlines) if "```" in line]
     if len(indexlines) < 2:

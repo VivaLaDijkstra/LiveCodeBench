@@ -1,8 +1,10 @@
-import numpy as np
 from concurrent.futures import ProcessPoolExecutor
+
+import numpy as np
 import tqdm
 
 from lcb_runner.evaluation.utils_execute import BASE_IMPORTS, check_correctness
+
 
 def evaluate_score(args) -> list[bool]:
     gs, (c, i, o) = args
@@ -18,9 +20,12 @@ def evaluate_score(args) -> list[bool]:
         execution_results = [False] * len(gs)
     return execution_results
 
+
 def pass_at_k(n, c, k):
-    if n - c < k: return 1.0
+    if n - c < k:
+        return 1.0
     return 1.0 - np.prod(1.0 - k / np.arange(n - c + 1, n + 1))
+
 
 def code_execution_metrics(
     samples,
